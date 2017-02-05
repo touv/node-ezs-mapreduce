@@ -1,0 +1,33 @@
+{
+  "name": "ezs-mapreduce",
+  "version": "1.0.0",
+  "description": "MAP/REDUCE statements form EZS",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/touv/node-ezs-mapreduce.git"
+  },
+  "keywords": [
+    "ezs"
+  ],
+  "author": "Nicolas Thouvenin <nthouvenin@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/touv/node-ezs-mapreduce/issues"
+  },
+  "homepage": "https://github.com/touv/node-ezs-mapreduce#readme",
+  "dependencies": {
+    "cbor": "^3.0.0",
+    "inist-ark": "^2.0.0",
+    "jbj": "^7.1.4",
+    "jbj-parse": "^2.0.0",
+    "jsonld": "^0.4.11"
+  },
+  "devDependencies": {
+    "ezs": "^1.1.0",
+    "ezs-basics": "^1.0.0"
+  }
+}

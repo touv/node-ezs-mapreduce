@@ -1,0 +1,24 @@
+#!/usr/bin/env node
+'use strict';
+
+const fs = require('fs');
+const path = require('path');
+const JBJ = require('jbj')
+JBJ.use(require('jbj-parse'));
+
+const ezs = require('ezs');
+ezs.use(require('ezs-basics'));
+ezs.use(require('..'));
+
+const input = path.resolve(__dirname,'./films/input.csv')
+const model = require('./films/model.json')
+
+fs.createReadStream(input)
+  .pipe(ezs('CSVParse', { separator: "," }))
+  .pipe(ezs('CSVObject'))
+  .pipe(ezs('JBJInject', model))
+  .pipe(ezs('max', { field : "c10.content" }))
+  .pipe(ezs('jsonify'))
+  .pipe(process.stdout)
+;
+
