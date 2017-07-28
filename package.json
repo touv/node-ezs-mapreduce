@@ -1,6 +1,6 @@
 {
   "name": "ezs-mapreduce",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Map & Reduce statements for EZS",
   "directories": {
     "test": "test"
