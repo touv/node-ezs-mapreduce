@@ -4,7 +4,7 @@ This package cannot be used alone. EZS has to be installed.
 
 ## Example
 
-```js
+```ini
 #!/usr/bin/env ezs
 
 [use]
@@ -30,9 +30,45 @@ field = B
 ## Statements
 
 
-<a id="distinct"></a>
 ### distinct
 -  **field** = access key for field
 
-disctinct groupe bield by value
+## count
+-  **field** = access key for field
 
+## distinct
+-  **field** = access key for field
+
+## graph
+-  **field** = access key for field
+
+## groupby
+-  **field** = access key for field
+
+## keys
+-  **field** = access key for field
+
+## max
+-  **field** = access key for field
+
+## merge
+-  **field** = access key for field
+
+## min
+-  **field** = access key for field
+
+## stats
+-  **field** = access key for field
+
+## ventilate
+-  **field** = access key for field
+
+
+## Run examples
+
+```bash
+
+$ npm run build
+$ ./examples/csv-max.ezs < ./examples/data/csv
+
+```
