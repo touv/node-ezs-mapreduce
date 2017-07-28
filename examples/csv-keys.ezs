@@ -1,0 +1,21 @@
+#!/usr/bin/env ezs
+
+# Take CSV input and get JSON
+
+[use]
+plugin = basics
+plugin = mapreduce
+
+# Parse CSV input
+[CSVParse]
+
+# Transform each line on a object
+[CSVObject]
+
+# Build catalogu of fields
+[keys]
+
+# generate JSON
+[JSONString]
+indent = true
+

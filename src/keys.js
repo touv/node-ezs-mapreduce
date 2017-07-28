@@ -1,5 +1,3 @@
-"use strict";
-
 /* eslint-disable func-names */
 /* eslint-disable vars-on-top */
 /* eslint-disable no-var */
@@ -12,26 +10,18 @@ module.exports.map = function (emit, scope) {
     dta.uri = doc.uri;
 
     // below it's like mongodb
-    fields.filter(function (key) {
-        return dta[key] || doc[key];
-    }).forEach(function (key) {
-        var field = dta[key] || doc[key];
-        if (field instanceof Array) {
-            field.forEach(function (fld) {
-                emit(key, Number(fld));
-            });
-        } else {
-            emit(key, Number(field));
-        }
+    Object.keys(dta).forEach(function (key) {
+        emit(key, 1);
     });
 };
 
 module.exports.reduce = function (key, values) {
-    return values.reduce(function (a, b) {
-        return a > b ? a : b;
-    });
+    return values.reduce(function (p, c) {
+        return p + c;
+    }, 0);
 };
 /* eslint-enable func-names */
 /* eslint-enable no-var */
 /* eslint-enable prefer-arrow-callback */
 /* eslint-enable vars-on-top */
+

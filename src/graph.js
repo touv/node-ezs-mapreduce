@@ -1,5 +1,3 @@
-"use strict";
-
 /* eslint-disable func-names */
 /* eslint-disable vars-on-top */
 /* eslint-disable no-var */
@@ -25,31 +23,34 @@ module.exports.map = function (emit, scope) {
             });
         }
     } else if (fields.length > 1) {
-        values = fields.map(function (field) {
-            var fieldValues = {};
-            fieldValues[field] = dta[field];
-            return fieldValues;
-        }).reduce(function (previous, current) {
-            var field = Object.keys(current)[0];
-            if (Array.isArray(current[field])) {
-                current[field].sort().forEach(function (value) {
+        values = fields
+            .map(function (field) {
+                var fieldValues = {};
+                fieldValues[field] = dta[field];
+                return fieldValues;
+            })
+            .reduce(function (previous, current) {
+                var field = Object.keys(current)[0];
+                if (Array.isArray(current[field])) {
+                    current[field].sort().forEach(function (value) {
+                        var o = {};
+                        o[field] = value;
+                        previous.push(o);
+                    });
+                } else {
                     var o = {};
-                    o[field] = value;
+                    o[field] = current[field];
                     previous.push(o);
-                });
-            } else {
-                var o = {};
-                o[field] = current[field];
-                previous.push(o);
-            }
-            return previous;
-        }, []);
+                }
+                return previous;
+            }, []);
     }
-    values.forEach(function (v, i) {
-        values.slice(i + 1).forEach(function (w) {
-            emit(JSON.stringify([v, w]), 1);
+    values
+        .forEach(function (v, i) {
+            values.slice(i + 1).forEach(function (w) {
+                emit(JSON.stringify([v, w]), 1);
+            });
         });
-    });
 };
 
 module.exports.reduce = function (key, values) {
