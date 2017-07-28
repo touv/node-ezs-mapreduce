@@ -1,5 +1,3 @@
-"use strict";
-
 /* eslint-disable func-names */
 /* eslint-disable vars-on-top */
 /* eslint-disable no-var */
@@ -12,32 +10,34 @@ module.exports.map = function (emit, scope) {
     dta.uri = doc.uri;
 
     // below it's like mongodb
-    fields.filter(function (key) {
-        return dta[key] || doc[key];
-    }).forEach(function (key) {
-        var field = dta[key] || doc[key];
-        if (field instanceof Array) {
-            field.forEach(function (fld) {
-                var val = Number(fld);
+    fields
+        .filter(function (key) {
+            return (dta[key] || doc[key]);
+        })
+        .forEach(function (key) {
+            var field = dta[key] || doc[key];
+            if (field instanceof Array) {
+                field.forEach(function (fld) {
+                    var val = Number(fld);
+                    emit(key, {
+                        sum: val || 0,
+                        min: val || 0,
+                        max: val || 0,
+                        count: 1,
+                        diff: 0,
+                    });
+                });
+            } else {
+                var val = Number(field);
                 emit(key, {
                     sum: val || 0,
                     min: val || 0,
                     max: val || 0,
                     count: 1,
-                    diff: 0
+                    diff: 0,
                 });
-            });
-        } else {
-            var val = Number(field);
-            emit(key, {
-                sum: val || 0,
-                min: val || 0,
-                max: val || 0,
-                count: 1,
-                diff: 0
-            });
-        }
-    });
+            }
+        });
 };
 
 module.exports.reduce = function (key, values) {
@@ -50,7 +50,7 @@ module.exports.reduce = function (key, values) {
             min: Math.min(previous.min, current.min),
             max: Math.max(previous.max, current.max),
             count: previous.count + current.count,
-            diff: previous.diff + current.diff + delta * delta * weight
+            diff: previous.diff + current.diff + delta * delta * weight,
         };
     });
 };

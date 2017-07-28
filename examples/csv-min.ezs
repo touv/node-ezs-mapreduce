@@ -1,0 +1,25 @@
+#!/usr/bin/env ezs
+
+# Take CSV input and get JSON
+
+[use]
+plugin = basics
+plugin = mapreduce
+
+# Parse CSV input
+[CSVParse]
+
+# Transform each line on a object
+[CSVObject]
+
+[attribute]
+key = rate
+value = get('rating').parseInt()
+
+[min]
+field = rate
+
+# generate JSON
+[JSONString]
+indent = true
+
