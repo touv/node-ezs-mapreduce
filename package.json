@@ -19,7 +19,9 @@
   },
   "homepage": "https://github.com/touv/node-ezs-mapreduce#readme",
   "dependencies": {
-      "cbor": "^3.0.0"
+    "async.queue": "^0.5.2",
+    "cbor": "^3.0.0",
+    "tmp-filepath": "^2.0.0"
   },
   "main": "./lib/index.js",
   "scripts": {

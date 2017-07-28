@@ -1,33 +1,48 @@
 import fs from 'fs';
+import os from 'os';
 import crypto from 'crypto';
 import cbor from 'cbor';
-import os from 'os';
-import path from 'path';
+import tmpFilepath from 'tmp-filepath';
+import queue from 'async.queue';
+
+const hashing = string => crypto.createHash('sha1').update(JSON.stringify(string)).digest('hex');
+
+const save = store => (task, callback) => {
+    const hash = hashing(task.key);
+    if (!store[hash]) {
+        store[hash] = {};
+        store[hash].key = task.key;
+        store[hash].filepath = tmpFilepath('.bin');
+        store[hash].filehandle = fs.createWriteStream(store[hash].filepath);
+    }
+    store[hash].filehandle.write(cbor.encode(task.value));
+    callback();
+};
 
 function core(data, feed, operator) {
-    const self = this;
-    let fields = self.getParam('field', '_id');
+    let fields = this.getParam('field', '_id');
     if (!Array.isArray(fields)) {
         fields = [fields];
     }
+    if (!this.store) {
+        this.store = {};
+    }
 
-    if (self.isFirst()) {
-        self.store = {};
-    } else if (self.isLast()) {
-        const maxi = Object.keys(self.store).length;
+    if (this.isLast()) {
+        const maxi = Object.keys(this.store).length;
         let cur = 0;
-        Object.keys(self.store).forEach((hash) => {
-            self.store[hash].filehandle.close();
-            self.store[hash].values = [];
-            self.store[hash].outstrm = fs.createReadStream(self.store[hash].filepath);
-            self.store[hash].decoder = new cbor.Decoder();
-            self.store[hash].decoder.on('data', (obj) => {
-                self.store[hash].values.push(obj);
+        Object.keys(this.store).forEach((hash) => {
+            this.store[hash].filehandle.close();
+            this.store[hash].values = [];
+            this.store[hash].outstrm = fs.createReadStream(this.store[hash].filepath);
+            this.store[hash].decoder = new cbor.Decoder();
+            this.store[hash].decoder.on('data', (obj) => {
+                this.store[hash].values.push(obj);
             });
-            self.store[hash].decoder.on('end', () => {
+            this.store[hash].decoder.on('end', () => {
                 cur += 1;
-                const key = self.store[hash].key;
-                let value = operator.reduce(self.store[hash].key, self.store[hash].values);
+                const key = this.store[hash].key;
+                let value = operator.reduce(this.store[hash].key, this.store[hash].values);
                 if (operator.finalize) {
                     value = operator.finalize(key, value);
                 }
@@ -35,28 +50,23 @@ function core(data, feed, operator) {
                     _id: key,
                     value,
                 });
-                if (cur === maxi) {
-                    feed.close();
-                }
+                fs.unlink(this.store[hash].filepath, () => {
+                    if (cur === maxi) {
+                        feed.close();
+                    }
+                });
             });
-            self.store[hash].outstrm.pipe(self.store[hash].decoder);
+            this.store[hash].outstrm.pipe(this.store[hash].decoder);
         });
         return;
     }
+    const q = queue(save(this.store), os.cpus().length);
 
-    const emit = (key, value) => {
-        const hash = crypto.createHash('sha1').update(JSON.stringify(key)).digest('hex');
-        if (!self.store[hash]) {
-            self.store[hash] = {};
-            self.store[hash].key = key;
-            self.store[hash].filepath = path.resolve(os.tmpdir(), hash);
-            self.store[hash].filehandle = fs.createWriteStream(self.store[hash].filepath);
-        }
-        self.store[hash].filehandle.write(cbor.encode(value));
-    };
-    operator.map.call(data, emit, { fields });
+    operator.map.call(data, (key, value) => {
+        q.push({ key, value });
+    }, { fields });
 
-    feed.end();
+    q.drain = () => feed.end();
 }
 
 export default core;
